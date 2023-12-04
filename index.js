@@ -29,31 +29,33 @@ const initializeDBAndServer = async () => {
 initializeDBAndServer()
 
 // Get Books API
-app.get('/books/', async (request, response) => {
-  let jwtToken
-  const authHeader = request.headers['Authorization']
+app.get("/books/", (request, response) => {
+  let jwtToken;
+  const authHeader = request.headers["authorization"];
   if (authHeader !== undefined) {
-    jwtToken = authHeader.split(' ')[1]
+    jwtToken = authHeader.split(" ")[1];
   }
-
   if (jwtToken === undefined) {
-    response.status(401)
-    response.send('Invalid Access token')
+    response.status(401);
+    response.send("Invalid Access Token");
   } else {
-    jwt.verify(jwtToken, 'vishaldev', async (error, user) => {
+    jwt.verify(jwtToken, "MY_SECRET_TOKEN", async (error, payload) => {
       if (error) {
-        response.status(401)
-        response.send('Invalid access token')
+        response.send("Invalid Access Token");
       } else {
         const getBooksQuery = `
-          SELECT * FROM book ORDER BY book_id;`
-        const booksArray = await db.all(getBooksQuery)
-        response.send(booksArray)
+            SELECT
+              *
+            FROM
+             book
+            ORDER BY
+              book_id;`;
+        const booksArray = await db.all(getBooksQuery);
+        response.send(booksArray);
       }
-    })
+    });
   }
-})
-
+});
 // User Register API
 app.post('/users/', async (request, response) => {
   const {username, name, password, gender, location} = request.body
